@@ -15,19 +15,24 @@ def geoDistanceCalculator(req: func.HttpRequest) -> func.HttpResponse:
     if lat1 == None or long1 == None or lat2 == None or long2 == None:
         return func.HttpResponse(json.dumps({'success': False, 'error': "Missing parameters"}), status_code=400)
     
-    coord1 = (float(lat1), float(long1))
-    coord2 = (float(lat2), float(long2))
-
-    distance = haversine_distance(coord1, coord2)
-
-    if distance == False:
+    try:
+        coord1 = (float(lat1), float(long1))
+        coord2 = (float(lat2), float(long2))
+    
+    except:
         return func.HttpResponse(json.dumps({'success': False, 'error': "Invalid parameters"}), status_code=400)
+    
+    else:
+        distance = haversine_distance(coord1, coord2)
 
-    formattedDistance = formatOutput(distance)
+        if distance == False:
+            return func.HttpResponse(json.dumps({'success': False, 'error': "Invalid parameters"}), status_code=400)
 
-    logging.info(f'({lat1},{long1}) -> ({lat2},{long2}) = {formattedDistance}')
+        formattedDistance = formatOutput(distance)
 
-    return func.HttpResponse(json.dumps({'success': True, 'distance': formattedDistance}), status_code=200)
+        logging.info(f'({lat1},{long1}) -> ({lat2},{long2}) = {formattedDistance}')
+
+        return func.HttpResponse(json.dumps({'success': True, 'distance': formattedDistance}), status_code=200)
 
 def formatOutput(distance: float) -> str:
     if distance < 0:
